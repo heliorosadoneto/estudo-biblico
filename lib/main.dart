@@ -43,7 +43,7 @@ class _AppState extends State<DiarioApp> with WidgetsBindingObserver {
 
   @override
   Widget build(BuildContext context) => MaterialApp(
-        title: 'Meu Diário',
+        title: 'Estudo Bíblico',
         debugShowCheckedModeBanner: false,
         theme: Ui.theme(),
         locale: const Locale('pt', 'BR'),
@@ -74,7 +74,7 @@ class _ShellState extends State<HomeShell> {
         bottomNavigationBar: NavigationBar(
           selectedIndex: _i, onDestinationSelected: (i) => setState(() => _i = i),
           destinations: const [
-            NavigationDestination(icon: Icon(Icons.book_outlined), selectedIcon: Icon(Icons.book), label: 'Diário'),
+            NavigationDestination(icon: Icon(Icons.edit_note_outlined), selectedIcon: Icon(Icons.edit_note), label: 'Estudos'),
             NavigationDestination(icon: Icon(Icons.menu_book_outlined), selectedIcon: Icon(Icons.menu_book), label: 'Bíblia'),
             NavigationDestination(icon: Icon(Icons.settings_outlined), selectedIcon: Icon(Icons.settings), label: 'Ajustes'),
           ],

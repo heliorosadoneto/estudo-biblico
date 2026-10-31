@@ -69,7 +69,7 @@ void main() {
     await t.pumpAndSettle();
     await expectLater(find.byType(RepaintBoundary).first, matchesGoldenFile('../shots/list_ano_aberto.png'));
   });
-  testWidgets('menu', (t) => shot(t, wrap(HomeShell(store: store, now: now)), 'menu_diario'));
+  testWidgets('menu', (t) => shot(t, wrap(HomeShell(store: store, now: now)), 'menu_estudos'));
   testWidgets('livros', (t) => shot(t, wrap(HomeShell(store: store, initial: 1, now: now)), 'biblia_livros'));
   testWidgets('capitulos', (t) => shot(t, wrap(ChaptersScreen(bible: Bible.instance!, book: 18)), 'biblia_capitulos'));
   testWidgets('leitura', (t) => shot(t, wrap(ReaderScreen(bible: Bible.instance!, book: 42, chapter: 3, highlight: 16)), 'biblia_leitura'));

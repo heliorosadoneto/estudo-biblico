@@ -56,7 +56,7 @@ class Ui {
       color: surface, borderRadius: BorderRadius.circular(radius), border: Border.all(color: active ? red.withValues(alpha: .5) : border));
 }
 
-/// Logo: quadrado vermelho arredondado com página branca e marcador.
+/// Logo: quadrado vermelho arredondado com bíblia aberta e cruz brancas.
 class AppLogo extends StatelessWidget {
   final double size;
   const AppLogo({super.key, this.size = 72});
@@ -68,20 +68,27 @@ class _LogoPainter extends CustomPainter {
   @override
   void paint(Canvas c, Size s) {
     final w = s.width;
+    Offset o(double x, double y) => Offset(w * x, w * y);
     c.drawRRect(RRect.fromRectAndRadius(Offset.zero & s, Radius.circular(w * .26)), Paint()..color = Ui.red);
-    // página (D estilizado)
-    final page = Path()
-      ..moveTo(w * .28, w * .22)
-      ..lineTo(w * .52, w * .22)
-      ..arcToPoint(Offset(w * .52, w * .78), radius: Radius.circular(w * .28))
-      ..lineTo(w * .28, w * .78)
+    final white = Paint()..color = Colors.white;
+    // cruz
+    c.drawRRect(RRect.fromRectAndRadius(Rect.fromLTRB(w * .455, w * .13, w * .545, w * .47), Radius.circular(w * .02)), white);
+    c.drawRRect(RRect.fromRectAndRadius(Rect.fromLTRB(w * .36, w * .215, w * .64, w * .295), Radius.circular(w * .02)), white);
+    // livro aberto (duas páginas curvas)
+    Path page(double side) => Path()
+      ..moveTo(w * .5 - side * w * .025, w * .58)
+      ..quadraticBezierTo(w * .5 - side * w * .17, w * .49, w * .5 - side * w * .33, w * .53)
+      ..lineTo(w * .5 - side * w * .33, w * .81)
+      ..quadraticBezierTo(w * .5 - side * w * .17, w * .77, w * .5 - side * w * .025, w * .86)
       ..close();
-    c.drawPath(page, Paint()..color = Colors.white);
-    // marcador
-    final mark = Path()
-      ..moveTo(w * .36, w * .22)..lineTo(w * .46, w * .22)..lineTo(w * .46, w * .5)
-      ..lineTo(w * .41, w * .44)..lineTo(w * .36, w * .5)..close();
-    c.drawPath(mark, Paint()..color = Ui.red);
+    c.drawPath(page(1), white);
+    c.drawPath(page(-1), white);
+    // linhas de texto em vermelho
+    final line = Paint()..color = Ui.red.withValues(alpha: .55)..strokeWidth = w * .018..strokeCap = StrokeCap.round;
+    for (final y in [.62, .68, .74]) {
+      c.drawLine(o(.22, y), o(.42, y + .03), line);
+      c.drawLine(o(.78, y), o(.58, y + .03), line);
+    }
   }
   @override
   bool shouldRepaint(_) => false;

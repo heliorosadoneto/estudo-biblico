@@ -65,7 +65,7 @@ class _ListState extends State<ListScreen> {
 
   Future<bool> _confirmDelete(Entry e) async {
     final ok = await showDialog<bool>(context: context, builder: (c) => AlertDialog(
-          title: const Text('Apagar página?'),
+          title: const Text('Apagar anotação?'),
           content: Text('“${e.title.isEmpty ? 'Sem título' : e.title}” será apagada para sempre.', style: Ui.small),
           actions: [
             TextButton(onPressed: () => Navigator.pop(c, false), child: const Text('Cancelar', style: TextStyle(color: Ui.muted))),
@@ -180,17 +180,17 @@ class _ListState extends State<ListScreen> {
         title: _searching
             ? TextField(autofocus: true, style: Ui.body, decoration: const InputDecoration(hintText: 'Procurar…', isDense: true),
                 onChanged: (v) => setState(() => _q = v))
-            : const Row(children: [AppLogo(size: 30), SizedBox(width: 12), Text('Meu Diário')]),
+            : const Row(children: [AppLogo(size: 30), SizedBox(width: 12), Text('Estudo Bíblico')]),
         actions: [
           IconButton(icon: Icon(_searching ? Icons.close : Icons.search), onPressed: () => setState(() { _searching = !_searching; _q = ''; })),
           const SizedBox(width: 8),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(onPressed: () => _edit(), icon: const Icon(Icons.add), label: const Text('Nova página', style: TextStyle(fontWeight: FontWeight.w700))),
+      floatingActionButton: FloatingActionButton.extended(onPressed: () => _edit(), icon: const Icon(Icons.add), label: const Text('Nova anotação', style: TextStyle(fontWeight: FontWeight.w700))),
       body: ListView(padding: const EdgeInsets.fromLTRB(16, 4, 16, 100), children: [
         ...children,
         if (items.isEmpty) Padding(padding: const EdgeInsets.only(top: 60),
-            child: Text(_all.isEmpty ? 'Nenhuma página ainda.\nToque em "Nova página" para começar.' : 'Nada encontrado.', textAlign: TextAlign.center, style: Ui.small)),
+            child: Text(_all.isEmpty ? 'Nenhuma anotação ainda.\nToque em "Nova anotação" para começar.' : 'Nada encontrado.', textAlign: TextAlign.center, style: Ui.small)),
       ]),
     );
   }

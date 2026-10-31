@@ -38,9 +38,9 @@ class _LockState extends State<LockScreen> {
               child: Column(children: [
                 const AppLogo(size: 84),
                 const SizedBox(height: 24),
-                const Text('Meu Diário', style: Ui.h1),
+                const Text('Estudo Bíblico', style: Ui.h1),
                 const SizedBox(height: 6),
-                Text(widget.creating ? 'Crie uma senha para proteger seu diário' : 'Digite sua senha para continuar', style: Ui.small),
+                Text(widget.creating ? 'Crie uma senha para proteger seus estudos' : 'Digite sua senha para continuar', style: Ui.small),
                 const SizedBox(height: 36),
                 TextField(
                   controller: _pw, obscureText: !_show, style: Ui.body,

@@ -52,7 +52,7 @@ class _SettingsState extends State<SettingsScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
               const Row(children: [AppLogo(size: 36), SizedBox(width: 12), Text('Sobre', style: Ui.h2)]),
               const SizedBox(height: 12),
-              const Text('Meu Diário · versão 1.0', style: Ui.small),
+              const Text('Estudo Bíblico · versão 1.1', style: Ui.small),
               const SizedBox(height: 12),
               Text('TEXTO BÍBLICO', style: Ui.date.copyWith(fontSize: 11)),
               const SizedBox(height: 6),
@@ -70,7 +70,7 @@ Future<String?> askPassword(BuildContext context, String title, String msg) {
         content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(msg, style: Ui.small),
           const SizedBox(height: 14),
-          TextField(controller: c, obscureText: true, autofocus: true, style: Ui.body, decoration: const InputDecoration(hintText: 'Senha do diário')),
+          TextField(controller: c, obscureText: true, autofocus: true, style: Ui.body, decoration: const InputDecoration(hintText: 'Senha do app')),
         ]),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar', style: TextStyle(color: Ui.muted))),
@@ -123,30 +123,30 @@ class _BackupCardState extends State<BackupCard> {
   }
 
   Future<void> _restoreDrive() async {
-    if (!await confirm(context, 'Restaurar do Drive?', 'As páginas atuais deste aparelho serão substituídas pelas do backup.', 'Restaurar')) return;
+    if (!await confirm(context, 'Restaurar do Drive?', 'As anotações atuais deste aparelho serão substituídas pelas do backup.', 'Restaurar')) return;
     if (!mounted) return;
-    final pw = await askPassword(context, 'Senha do backup', 'Digite a senha do diário usada quando o backup foi feito.');
+    final pw = await askPassword(context, 'Senha do backup', 'Digite a senha do app usada quando o backup foi feito.');
     if (pw == null) return;
-    await _run(() async { final n = await DriveBackup.restore(pw); _toast('$n páginas restauradas'); });
+    await _run(() async { final n = await DriveBackup.restore(pw); _toast('$n anotações restauradas'); });
   }
 
   Future<void> _export() => _run(() async {
         final pw = Session.password;
-        if (pw == null) throw Exception('Desbloqueie o diário primeiro');
+        if (pw == null) throw Exception('Desbloqueie o app primeiro');
         final bytes = await Backup.export(widget.store, pw);
-        final name = 'meu_diario_${DateFormat('yyyy-MM-dd').format(DateTime.now())}.mdb';
-        final uri = await FilePicker.saveFile(fileName: name, bytes: bytes, dialogTitle: 'Salvar cópia do diário');
-        if (uri != null) _toast('Cópia salva (cifrada com a senha do diário)');
+        final name = 'estudo_biblico_${DateFormat('yyyy-MM-dd').format(DateTime.now())}.mdb';
+        final uri = await FilePicker.saveFile(fileName: name, bytes: bytes, dialogTitle: 'Salvar cópia dos estudos');
+        if (uri != null) _toast('Cópia salva (cifrada com a senha do app)');
       });
 
   Future<void> _import() async {
-    final f = await FilePicker.pickFile(dialogTitle: 'Escolher cópia do diário');
+    final f = await FilePicker.pickFile(dialogTitle: 'Escolher cópia dos estudos');
     if (f == null || !mounted) return;
-    if (!await confirm(context, 'Importar cópia?', 'As páginas atuais deste aparelho serão substituídas pelas da cópia.', 'Importar')) return;
+    if (!await confirm(context, 'Importar cópia?', 'As anotações atuais deste aparelho serão substituídas pelas da cópia.', 'Importar')) return;
     if (!mounted) return;
-    final pw = await askPassword(context, 'Senha da cópia', 'Digite a senha do diário usada quando a cópia foi feita.');
+    final pw = await askPassword(context, 'Senha da cópia', 'Digite a senha do app usada quando a cópia foi feita.');
     if (pw == null) return;
-    await _run(() async { final n = await Backup.import(widget.store, await f.readAsBytes(), pw); DriveBackup.changes.value++; _toast('$n páginas importadas'); });
+    await _run(() async { final n = await Backup.import(widget.store, await f.readAsBytes(), pw); DriveBackup.changes.value++; _toast('$n anotações importadas'); });
   }
 
   Widget _action(IconData i, String t, VoidCallback? on) => ListTile(
@@ -167,7 +167,7 @@ class _BackupCardState extends State<BackupCard> {
           if (_busy) const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Ui.red)),
         ]),
         const SizedBox(height: 6),
-        const Text('Cópia cifrada com a senha do diário, numa pasta oculta do seu Drive.', style: Ui.small),
+        const Text('Cópia cifrada com a senha do app, numa pasta oculta do seu Drive.', style: Ui.small),
         const SizedBox(height: 14),
         Container(
           padding: const EdgeInsets.all(12),
@@ -189,7 +189,7 @@ class _BackupCardState extends State<BackupCard> {
         SwitchListTile(
           contentPadding: EdgeInsets.zero, value: _auto, activeThumbColor: Colors.white, activeTrackColor: Ui.red,
           title: Text('Backup automático', style: Ui.body.copyWith(fontSize: 15)),
-          subtitle: const Text('Depois de salvar uma página e ao sair do app', style: Ui.small),
+          subtitle: const Text('Depois de salvar uma anotação e ao sair do app', style: Ui.small),
           onChanged: email == null ? null : (v) { DriveBackup.setAuto(v); setState(() => _auto = v); },
         ),
         _action(Icons.cloud_upload_outlined, 'Fazer backup agora', email == null ? null : () => _run(() async { await DriveBackup.backupNow(); _toast('Backup concluído'); })),

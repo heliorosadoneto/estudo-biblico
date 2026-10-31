@@ -46,3 +46,14 @@ app.*.map.json
 
 # Widget Preview related
 .widget_preview/
+
+# Assinatura e segredos — nunca versionar
+*.jks
+*.keystore
+key.properties
+android/key.properties
+android/local.properties
+*.apk
+*.aab
+.env
+google-services.json

@@ -94,7 +94,7 @@ class DriveBackup {
       return a;
     } catch (e) {
       throw Exception('Não foi possível conectar ao Google Drive. O login do Google ainda não foi configurado para este app '
-          '(veja docs/GOOGLE_DRIVE.md) ou não há internet. O diário continua funcionando normalmente.');
+          '(veja docs/GOOGLE_DRIVE.md) ou não há internet. O app continua funcionando normalmente.');
     }
   }
 
@@ -114,7 +114,7 @@ class DriveBackup {
 
   static Future<void> backupNow() async {
     final pw = Session.password;
-    if (pw == null) throw Exception('Desbloqueie o diário primeiro');
+    if (pw == null) throw Exception('Desbloqueie o app primeiro');
     final data = await Backup.export(store!, pw);
     final api = await _api();
     final media = drive.Media(Stream.value(data), data.length);

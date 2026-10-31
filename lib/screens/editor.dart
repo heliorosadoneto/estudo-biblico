@@ -77,7 +77,7 @@ class _EditorState extends State<EditorScreen> {
             const SizedBox(height: 16),
             TextField(controller: _body, maxLines: null, minLines: 16, keyboardType: TextInputType.multiline, style: Ui.body,
                 textCapitalization: TextCapitalization.sentences, autocorrect: true, enableSuggestions: true, spellCheckConfiguration: _spell,
-                decoration: _plain.copyWith(hintText: 'Como foi seu dia?', hintStyle: Ui.body.copyWith(color: Ui.muted))),
+                decoration: _plain.copyWith(hintText: 'O que você aprendeu hoje?', hintStyle: Ui.body.copyWith(color: Ui.muted))),
           ]),
         ),
       );
