@@ -63,19 +63,54 @@ class MemoryStore implements EntryStore {
   Future<void> replaceAll(List<Entry> entries) async { items..clear()..addAll(entries); for (var i = 0; i < items.length; i++) { items[i].id = i + 1; } }
 }
 
-/// Senha local: hash SHA-256 com sal aleatório.
+/// Local password. Only a salted SHA-256 hash is stored, never the plaintext.
+///
+/// The current record is a single preference so replacing the password cannot
+/// leave the previous hash in place if a second write is dropped. Records
+/// written by older builds (`pw_salt` + `pw_hash`) still verify until the next
+/// successful change, which removes them.
 class Auth {
-  static Future<bool> hasPassword() async => (await SharedPreferences.getInstance()).containsKey('pw_hash');
-  static String _hash(String salt, String pw) => sha256.convert(utf8.encode('$salt:$pw')).toString();
-  static Future<void> setPassword(String pw) async {
-    final r = Random.secure();
-    final salt = base64Url.encode(List.generate(16, (_) => r.nextInt(256)));
+  static const _recordKey = 'pw_record';
+  static const _legacyHashKey = 'pw_hash';
+  static const _legacySaltKey = 'pw_salt';
+
+  static Future<bool> hasPassword() async {
     final sp = await SharedPreferences.getInstance();
-    await sp.setString('pw_salt', salt);
-    await sp.setString('pw_hash', _hash(salt, pw));
+    return sp.containsKey(_recordKey) || sp.containsKey(_legacyHashKey);
   }
+
+  static String _hash(String salt, String pw) => sha256.convert(utf8.encode('$salt:$pw')).toString();
+
+  static String _newSalt() {
+    final r = Random.secure();
+    return base64Url.encode(List<int>.generate(16, (_) => r.nextInt(256)));
+  }
+
+  /// Persists [pw] and drops every previously stored secret.
+  static Future<void> setPassword(String pw) async {
+    final salt = _newSalt();
+    final record = jsonEncode({'s': salt, 'h': _hash(salt, pw)});
+    final sp = await SharedPreferences.getInstance();
+    if (!await sp.setString(_recordKey, record)) {
+      throw StateError('Could not persist the new password');
+    }
+    await sp.remove(_legacyHashKey);
+    await sp.remove(_legacySaltKey);
+  }
+
   static Future<bool> check(String pw) async {
     final sp = await SharedPreferences.getInstance();
-    return sp.getString('pw_hash') == _hash(sp.getString('pw_salt') ?? '', pw);
+    final record = sp.getString(_recordKey);
+    if (record != null) {
+      final decoded = jsonDecode(record);
+      if (decoded is! Map) return false;
+      final salt = decoded['s'] as String?;
+      final hash = decoded['h'] as String?;
+      if (salt == null || hash == null) return false;
+      return hash == _hash(salt, pw);
+    }
+    final hash = sp.getString(_legacyHashKey);
+    if (hash == null) return false;
+    return hash == _hash(sp.getString(_legacySaltKey) ?? '', pw);
   }
 }

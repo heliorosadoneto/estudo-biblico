@@ -35,9 +35,11 @@ class _AppState extends State<DiarioApp> with WidgetsBindingObserver {
   void dispose() { WidgetsBinding.instance.removeObserver(this); super.dispose(); }
   @override
   void didChangeAppLifecycleState(AppLifecycleState s) {
-    if (s == AppLifecycleState.paused) {
+    if (s == AppLifecycleState.paused || s == AppLifecycleState.hidden) {
       DriveBackup.auto().whenComplete(() => Session.password = _has ? null : Session.password);
-      if (_has) setState(() => _locked = true);
+      // Already locked: do not rebuild. A rebuild refreshes the IME connection
+      // and Android 10 autofill then writes the saved password over the typing.
+      if (_has && !_locked) setState(() => _locked = true);
     }
   }
 
@@ -52,9 +54,37 @@ class _AppState extends State<DiarioApp> with WidgetsBindingObserver {
         home: HomeShell(store: widget.store),
         builder: (context, child) => Stack(children: [
           child!,
-          if (_locked) Positioned.fill(child: LockScreen(creating: !_has, onUnlocked: () => setState(() { _locked = false; _has = true; }))),
+          // The builder sits above the Navigator, so it has no Overlay.
+          // A password field focused here throws on every keystroke and the
+          // IME puts the previous value back. LockOverlay supplies one.
+          if (_locked) Positioned.fill(child: _LockOverlay(creating: !_has, onUnlocked: () => setState(() { _locked = false; _has = true; }))),
         ]),
       );
+}
+
+/// Full-screen lock layer with its own [Overlay], so the password field can
+/// update its selection while the user types.
+class _LockOverlay extends StatefulWidget {
+  final bool creating;
+  final VoidCallback onUnlocked;
+  const _LockOverlay({required this.creating, required this.onUnlocked});
+  @override
+  State<_LockOverlay> createState() => _LockOverlayState();
+}
+
+class _LockOverlayState extends State<_LockOverlay> {
+  late final OverlayEntry _entry = OverlayEntry(
+    builder: (context) => LockScreen(creating: widget.creating, onUnlocked: widget.onUnlocked),
+  );
+
+  @override
+  void didUpdateWidget(_LockOverlay oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    _entry.markNeedsBuild();
+  }
+
+  @override
+  Widget build(BuildContext context) => Overlay(initialEntries: [_entry]);
 }
 
 class HomeShell extends StatefulWidget {

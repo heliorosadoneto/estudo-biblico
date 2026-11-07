@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../backup.dart';
 import '../bible.dart';
 import '../data.dart';
+import '../password_field.dart';
 import '../theme.dart';
 
 class SettingsScreen extends StatefulWidget {
@@ -14,17 +15,25 @@ class SettingsScreen extends StatefulWidget {
 }
 
 class _SettingsState extends State<SettingsScreen> {
-  final _old = TextEditingController(), _new = TextEditingController(), _conf = TextEditingController();
+  // Captured from the fields only. A rebuild must not copy the saved password back.
+  String _old = '', _next = '', _conf = '';
+  int _clear = 0;
   String? _msg;
 
   Future<void> _change() async {
-    if (!await Auth.check(_old.text)) return setState(() => _msg = 'Senha atual incorreta');
-    if (_new.text.length < 4) return setState(() => _msg = 'A nova senha precisa de ao menos 4 caracteres');
-    if (_new.text != _conf.text) return setState(() => _msg = 'As senhas não conferem');
-    await Auth.setPassword(_new.text);
-    Session.password = _new.text;
-    _old.clear(); _new.clear(); _conf.clear();
-    setState(() => _msg = 'Senha alterada com sucesso');
+    final old = _old, next = _next, conf = _conf;
+    if (!await Auth.check(old)) return setState(() => _msg = 'Senha atual incorreta');
+    if (next.length < 4) return setState(() => _msg = 'A nova senha precisa de ao menos 4 caracteres');
+    if (next != conf) return setState(() => _msg = 'As senhas não conferem');
+    try {
+      await Auth.setPassword(next);
+    } catch (_) {
+      if (mounted) setState(() => _msg = 'Não foi possível salvar a senha');
+      return;
+    }
+    Session.password = next;
+    if (!mounted) return;
+    setState(() { _clear++; _old = _next = _conf = ''; _msg = 'Senha alterada com sucesso'; });
   }
 
   @override
@@ -36,9 +45,13 @@ class _SettingsState extends State<SettingsScreen> {
             child: Column(crossAxisAlignment: CrossAxisAlignment.stretch, children: [
               const Text('Trocar senha', style: Ui.h2),
               const SizedBox(height: 16),
-              for (final (c, l) in [(_old, 'Senha atual'), (_new, 'Nova senha'), (_conf, 'Confirmar nova senha')])
+              for (final (hint, onChanged) in <(String, ValueChanged<String>)>[
+                ('Senha atual', (v) { _old = v; }),
+                ('Nova senha', (v) { _next = v; }),
+                ('Confirmar nova senha', (v) { _conf = v; }),
+              ])
                 Padding(padding: const EdgeInsets.only(bottom: 12),
-                    child: TextField(controller: c, obscureText: true, style: Ui.body, decoration: InputDecoration(hintText: l))),
+                    child: PasswordField(key: ValueKey(hint), hintText: hint, clearGeneration: _clear, onChanged: onChanged)),
               const SizedBox(height: 8),
               FilledButton(onPressed: _change, child: const Text('Salvar nova senha')),
               if (_msg != null) Padding(padding: const EdgeInsets.only(top: 14), child: Text(_msg!, style: Ui.small)),
@@ -64,17 +77,17 @@ class _SettingsState extends State<SettingsScreen> {
 }
 
 Future<String?> askPassword(BuildContext context, String title, String msg) {
-  final c = TextEditingController();
+  var value = '';
   return showDialog<String>(context: context, builder: (ctx) => AlertDialog(
         title: Text(title),
         content: Column(mainAxisSize: MainAxisSize.min, crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(msg, style: Ui.small),
           const SizedBox(height: 14),
-          TextField(controller: c, obscureText: true, autofocus: true, style: Ui.body, decoration: const InputDecoration(hintText: 'Senha do app')),
+          PasswordField(hintText: 'Senha do app', autofocus: true, onChanged: (v) { value = v; }),
         ]),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Cancelar', style: TextStyle(color: Ui.muted))),
-          TextButton(onPressed: () => Navigator.pop(ctx, c.text), child: const Text('Continuar')),
+          TextButton(onPressed: () => Navigator.pop(ctx, value), child: const Text('Continuar')),
         ],
       ));
 }
