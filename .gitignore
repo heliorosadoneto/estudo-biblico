@@ -57,3 +57,6 @@ android/local.properties
 *.aab
 .env
 google-services.json
+
+# APKs published in the repo (like TAPKEY)
+!releases/*.apk
