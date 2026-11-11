@@ -3,6 +3,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'backup.dart';
 import 'data.dart';
+import 'store_scope.dart';
 import 'theme.dart';
 import 'screens/list.dart';
 import 'screens/lock.dart';
@@ -44,7 +45,7 @@ class _AppState extends State<DiarioApp> with WidgetsBindingObserver {
   }
 
   @override
-  Widget build(BuildContext context) => MaterialApp(
+  Widget build(BuildContext context) => StoreScope(store: widget.store, child: MaterialApp(
         title: 'Estudo Bíblico',
         debugShowCheckedModeBanner: false,
         theme: Ui.theme(),
@@ -59,7 +60,7 @@ class _AppState extends State<DiarioApp> with WidgetsBindingObserver {
           // IME puts the previous value back. LockOverlay supplies one.
           if (_locked) Positioned.fill(child: _LockOverlay(creating: !_has, onUnlocked: () => setState(() { _locked = false; _has = true; }))),
         ]),
-      );
+      ));
 }
 
 /// Full-screen lock layer with its own [Overlay], so the password field can

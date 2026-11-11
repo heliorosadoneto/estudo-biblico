@@ -34,7 +34,9 @@ Tudo fica no próprio celular, protegido por senha. O backup no Google Drive é 
   - números dos versículos em vermelho;
   - tamanho de letra ajustável.
 - 🔎 **Busca** por palavra em toda a Bíblia (ignora acentos e maiúsculas).
-- ❤️ **Favoritos**: toque num versículo para salvar.
+- ❤️ **Favoritos**: selecione um versículo e toque em *Favoritar*.
+- 🖍️ **Marca-texto**: grife versículos em amarelo, laranja, rosa ou azul (fica salvo e vai no backup).
+- 📌 **Adicionar ao estudo**: envie o trecho selecionado para um estudo existente ou crie um estudo novo com ele.
 - ✨ **Versículo do dia** no topo da lista de anotações.
 - ➕ **Inserir versículos na anotação**: busque por palavra ou referência, marque vários e toque em *Inserir*.
 - 🗂️ **Organização automática**:
@@ -44,7 +46,7 @@ Tudo fica no próprio celular, protegido por senha. O backup no Google Drive é 
   - automático ou manual, numa pasta oculta;
   - cifrado com AES-256-GCM e a sua senha;
   - também é possível exportar e importar uma cópia em arquivo.
-- 🎨 Visual moderno em preto, branco e vermelho.
+- 🎨 Visual moderno em preto e branco, com ícone de uma Bíblia aberta em tons quentes.
 
 ## Como usar nos estudos
 
@@ -94,12 +96,20 @@ Na aba **Bíblia**:
 
 1. Escolha **Antigo** ou **Novo Testamento**, o livro e o capítulo.
 2. Use **A− / A+** para ajustar o tamanho da letra (o app lembra a sua escolha).
-3. Toque num versículo para **favoritá-lo** (♥). Veja todos em ❤️ **Favoritos**, no topo.
+3. Toque num versículo para **selecioná-lo** (toque em outros para selecionar vários). Aparece um painel com:
+   - **Grifar**: escolha amarelo, laranja, rosa ou azul (o ⊘ remove o grifo);
+   - **Favoritar** (♥). Veja todos em ❤️ **Favoritos**, no topo;
+   - **Adicionar ao estudo**: abre a lista dos seus estudos; toque num deles para colocar o trecho no final, ou em **Criar novo estudo** para começar um estudo com ele;
+   - **Copiar** o trecho com a referência.
 4. Use 🔎 para **buscar** uma palavra ou frase. Tocar num resultado abre o capítulo com o versículo destacado.
 
 | Capítulos | Busca | Favoritos |
 |---|---|---|
 | <img src="docs/screenshots/biblia_capitulos.png" width="200"> | <img src="docs/screenshots/biblia_busca.png" width="200"> | <img src="docs/screenshots/biblia_favoritos.png" width="200"> |
+
+| Versículo selecionado | Grifos coloridos | Escolher o estudo | Novo estudo |
+|---|---|---|---|
+| <img src="docs/screenshots/versiculo_selecionado.png" width="200"> | <img src="docs/screenshots/versiculo_grifado.png" width="200"> | <img src="docs/screenshots/estudo_lista.png" width="200"> | <img src="docs/screenshots/estudo_novo.png" width="200"> |
 
 ### 5. Versículo do dia
 No topo da aba **Estudos** aparece um versículo diferente a cada dia. Toque nele para abrir o capítulo e começar o estudo por ali.
@@ -125,7 +135,7 @@ Em **Ajustes › Backup no Google Drive**:
 - **Fazer backup agora** / **Restaurar do Drive**: o app pede confirmação e a senha usada no backup.
 - **Exportar cópia (arquivo)** / **Importar cópia (arquivo)**: um arquivo `.mdb` cifrado que você pode guardar onde quiser. Funciona sem Google.
 
-O backup inclui as anotações e os versículos favoritos. A senha não vai no backup.
+O backup inclui as anotações, os versículos favoritos e os grifos. A senha não vai no backup.
 
 <img src="docs/screenshots/ajustes_backup.png" width="220">
 
@@ -161,9 +171,11 @@ lib/
   data.dart            anotações (sqflite) e senha (hash SHA-256 com sal)
   bible.dart           Bíblia offline, busca, referências, favoritos
   backup.dart          backup cifrado, Google Drive e exportação
-  screens/             telas: lock, list, editor, bible, verse_picker, settings
+  store_scope.dart     acesso aos estudos a partir de qualquer tela
+  screens/             telas: lock, list, editor, bible, add_to_study, verse_picker, settings
 assets/
   biblia_livre.tsv.gz  texto bíblico completo (≈1,3 MB)
+  logo.png             logo (Bíblia aberta) usada no app
   fonts/Manrope.ttf
 docs/
   GOOGLE_DRIVE.md      configuração do login Google

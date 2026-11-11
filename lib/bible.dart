@@ -85,6 +85,14 @@ class Bible {
 class Favorites {
   static Future<List<VerseRef>> all() async =>
       ((await SharedPreferences.getInstance()).getStringList('fav') ?? []).map(VerseRef.parse).toList();
+  /// Favorita todos (ou remove todos, se já eram favoritos). Retorna true se adicionou.
+  static Future<bool> setAll(Iterable<VerseRef> refs, bool on) async {
+    final sp = await SharedPreferences.getInstance();
+    final l = sp.getStringList('fav') ?? [];
+    for (final r in refs) { l.remove(r.key); if (on) l.insert(0, r.key); }
+    await sp.setStringList('fav', l);
+    return on;
+  }
   static Future<bool> toggle(VerseRef r) async {
     final sp = await SharedPreferences.getInstance();
     final l = sp.getStringList('fav') ?? [];
@@ -95,6 +103,24 @@ class Favorites {
   }
   static Future<double> fontSize() async => (await SharedPreferences.getInstance()).getDouble('bible_font') ?? 18;
   static Future<void> setFontSize(double v) async => (await SharedPreferences.getInstance()).setDouble('bible_font', v);
+}
+
+/// Marca-texto por versículo: guarda o índice da cor em [HighlightColor.all].
+class Highlights {
+  static const _key = 'hl';
+  static Future<Map<String, int>> all() async {
+    final raw = (await SharedPreferences.getInstance()).getString(_key);
+    if (raw == null) return {};
+    final m = jsonDecode(raw);
+    return m is Map ? {for (final e in m.entries) e.key as String: (e.value as num).toInt()} : {};
+  }
+  /// [color] null remove o grifo.
+  static Future<Map<String, int>> set(Iterable<VerseRef> refs, int? color) async {
+    final m = await all();
+    for (final r in refs) { color == null ? m.remove(r.key) : m[r.key] = color; }
+    await (await SharedPreferences.getInstance()).setString(_key, jsonEncode(m));
+    return m;
+  }
 }
 
 /// Referência bíblica: "João 3:16", "Jo 3:16-18", "Sl 23", "1 Co 13:4".

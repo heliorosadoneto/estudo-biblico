@@ -56,40 +56,27 @@ class Ui {
       color: surface, borderRadius: BorderRadius.circular(radius), border: Border.all(color: active ? red.withValues(alpha: .5) : border));
 }
 
-/// Logo: quadrado vermelho arredondado com bíblia aberta e cruz brancas.
+/// Logo: foto de uma Bíblia aberta, em tons quentes, num quadrado arredondado.
 class AppLogo extends StatelessWidget {
   final double size;
   const AppLogo({super.key, this.size = 72});
+  static const asset = AssetImage('assets/logo.png');
   @override
-  Widget build(BuildContext context) => CustomPaint(size: Size.square(size), painter: _LogoPainter());
+  Widget build(BuildContext context) => ClipRRect(
+        borderRadius: BorderRadius.circular(size * .225),
+        child: Image(image: asset, width: size, height: size, fit: BoxFit.cover, filterQuality: FilterQuality.medium),
+      );
 }
 
-class _LogoPainter extends CustomPainter {
-  @override
-  void paint(Canvas c, Size s) {
-    final w = s.width;
-    Offset o(double x, double y) => Offset(w * x, w * y);
-    c.drawRRect(RRect.fromRectAndRadius(Offset.zero & s, Radius.circular(w * .26)), Paint()..color = Ui.red);
-    final white = Paint()..color = Colors.white;
-    // cruz
-    c.drawRRect(RRect.fromRectAndRadius(Rect.fromLTRB(w * .455, w * .13, w * .545, w * .47), Radius.circular(w * .02)), white);
-    c.drawRRect(RRect.fromRectAndRadius(Rect.fromLTRB(w * .36, w * .215, w * .64, w * .295), Radius.circular(w * .02)), white);
-    // livro aberto (duas páginas curvas)
-    Path page(double side) => Path()
-      ..moveTo(w * .5 - side * w * .025, w * .58)
-      ..quadraticBezierTo(w * .5 - side * w * .17, w * .49, w * .5 - side * w * .33, w * .53)
-      ..lineTo(w * .5 - side * w * .33, w * .81)
-      ..quadraticBezierTo(w * .5 - side * w * .17, w * .77, w * .5 - side * w * .025, w * .86)
-      ..close();
-    c.drawPath(page(1), white);
-    c.drawPath(page(-1), white);
-    // linhas de texto em vermelho
-    final line = Paint()..color = Ui.red.withValues(alpha: .55)..strokeWidth = w * .018..strokeCap = StrokeCap.round;
-    for (final y in [.62, .68, .74]) {
-      c.drawLine(o(.22, y), o(.42, y + .03), line);
-      c.drawLine(o(.78, y), o(.58, y + .03), line);
-    }
-  }
-  @override
-  bool shouldRepaint(_) => false;
+/// Cores de marca-texto, no espírito do Kindle.
+class HighlightColor {
+  final String name;
+  final Color color;
+  const HighlightColor(this.name, this.color);
+  static const all = [
+    HighlightColor('Amarelo', Color(0xFFFFD84D)),
+    HighlightColor('Laranja', Color(0xFFFF9F43)),
+    HighlightColor('Rosa', Color(0xFFFF7EB6)),
+    HighlightColor('Azul', Color(0xFF5DADE2)),
+  ];
 }

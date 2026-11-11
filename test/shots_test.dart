@@ -52,6 +52,7 @@ void main() {
   Future<void> shot(WidgetTester t, Widget w, String name) async {
     t.view.physicalSize = const Size(1080, 2400); t.view.devicePixelRatio = 2.75;
     await t.pumpWidget(RepaintBoundary(child: w));
+    await t.runAsync(() => precacheImage(AppLogo.asset, t.element(find.byType(MaterialApp).first)));
     await t.pumpAndSettle();
     await expectLater(find.byType(RepaintBoundary).first, matchesGoldenFile('../shots/$name.png'));
   }
@@ -112,7 +113,9 @@ void main() {
   });
   testWidgets('logo', (t) async {
     t.view.physicalSize = const Size(512, 512); t.view.devicePixelRatio = 1;
-    await t.pumpWidget(const Center(child: RepaintBoundary(child: AppLogo(size: 512))));
+    await t.pumpWidget(const Directionality(textDirection: TextDirection.ltr, child: Center(child: RepaintBoundary(child: AppLogo(size: 512)))));
+    await t.runAsync(() => precacheImage(AppLogo.asset, t.element(find.byType(Center).first)));
+    await t.pump();
     await expectLater(find.byType(RepaintBoundary).first, matchesGoldenFile('../shots/logo.png'));
   });
   testWidgets('app builds', (t) async { await t.pumpWidget(DiarioApp(store: store, hasPassword: false)); await t.pump(); });

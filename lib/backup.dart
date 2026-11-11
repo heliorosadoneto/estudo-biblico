@@ -53,6 +53,7 @@ class Backup {
       'app': 'meu_diario', 'version': 1, 'created': DateTime.now().toIso8601String(),
       'entries': [for (final e in await store.all()) e.toMap()..remove('id')],
       'favorites': sp.getStringList('fav') ?? [],
+      'highlights': jsonDecode(sp.getString('hl') ?? '{}'),
     }));
   }
 
@@ -61,7 +62,10 @@ class Backup {
     if (m['app'] != 'meu_diario') throw BadFile();
     final entries = [for (final e in m['entries'] as List) Entry.fromMap(Map<String, Object?>.from(e as Map))];
     await store.replaceAll(entries);
-    await (await SharedPreferences.getInstance()).setStringList('fav', List<String>.from(m['favorites'] as List));
+    final sp = await SharedPreferences.getInstance();
+    await sp.setStringList('fav', List<String>.from(m['favorites'] as List));
+    // Backups antigos não têm grifos: mantém os atuais.
+    if (m['highlights'] is Map) await sp.setString('hl', jsonEncode(m['highlights']));
     return entries.length;
   }
 
