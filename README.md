@@ -21,6 +21,26 @@ Tudo fica no próprio celular, protegido por senha. O backup no Google Drive é 
 |---|---|---|---|
 | <img src="docs/screenshots/lock.png" width="200"> | <img src="docs/screenshots/menu_estudos.png" width="200"> | <img src="docs/screenshots/biblia_livros.png" width="200"> | <img src="docs/screenshots/biblia_leitura.png" width="200"> |
 
+
+## Novidades desta versão
+
+Esta atualização traz uma logo nova e três formas de trabalhar o versículo direto na leitura da Bíblia.
+
+- **Logo nova.** O ícone antigo (cruz sobre a Bíblia, com fundo vermelho) foi trocado por uma imagem de uma Bíblia aberta de verdade, com páginas creme, fita dourada e fundo marrom quente, sem vermelho. Ela aparece no ícone do Android, no cabeçalho, na tela de bloqueio e em Ajustes › Sobre.
+- **Seleção de versículos.** Um toque agora *seleciona* o versículo (e dá para marcar vários). Só então aparece o painel com as ações abaixo.
+- **Marca-texto.** Grife o texto em amarelo, laranja, rosa ou azul. A cor fica salva e entra no backup cifrado. O ⊘ no painel remove o grifo.
+- **Favoritar.** A opção que já existia continua no mesmo lugar, agora dentro desse painel (Favoritar / Desfavoritar). A lista de Favoritos não mudou.
+- **Adicionar ao estudo.** Envia o trecho selecionado para um estudo já existente ou cria um estudo novo com ele. Se ainda não houver nenhum estudo, o app vai direto para a criação. Depois aparece o aviso *Trecho adicionado*, com o botão **Abrir**.
+- **Copiar.** Copia o trecho com a referência.
+
+| Logo (ícone) | Versículo selecionado | Grifos | Inserir no estudo |
+|---|---|---|---|
+| <img src="docs/screenshots/logo_launcher.png" width="200"> | <img src="docs/screenshots/versiculo_selecionado.png" width="200"> | <img src="docs/screenshots/versiculo_grifado.png" width="200"> | <img src="docs/screenshots/estudo_lista.png" width="200"> |
+
+| Novo estudo | Trecho inserido |
+|---|---|
+| <img src="docs/screenshots/estudo_novo.png" width="200"> | <img src="docs/screenshots/estudo_inserido_editor.png" width="200"> |
+
 ## Funcionalidades
 
 - 🔒 **Senha local**: o app pede a senha sempre que é aberto ou volta do segundo plano.
@@ -141,11 +161,17 @@ O backup inclui as anotações, os versículos favoritos e os grifos. A senha n�
 
 ## Instalação (APK)
 
-1. Baixe o `EstudoBiblico.apk` (Android 64-bit, arm64), por exemplo da página de *Releases* do repositório, se houver.
-2. No celular, abra o arquivo e permita **instalar apps desta fonte** quando o Android pedir.
-3. Abra o **Estudo Bíblico** e crie a sua senha.
+O APK de release fica na pasta [`releases/`](releases/) deste repositório:
 
-Quem já tinha a versão antiga ("Meu Diário") pode instalar por cima: o pacote é o mesmo (`com.helio.diario`) e os dados são mantidos.
+- [`releases/EstudoBiblico.apk`](releases/EstudoBiblico.apk)
+
+1. Baixe o arquivo no celular.
+2. Abra-o e permita **instalar apps desta fonte** quando o Android pedir.
+3. Abra o **Estudo Bíblico** e crie a sua senha (ou entre com a senha que já usa).
+
+Quem já tinha a versão antiga ("Meu Diário") pode instalar por cima: o pacote é o mesmo (`com.helio.diario`) e os dados (anotações, favoritos, senha e backups) são mantidos. Esta versão de release é assinada com uma chave própria; a chave e as senhas **não** entram no repositório (ficam só em `android/key.properties` na máquina que gera o APK).
+
+> Se o backup no Google Drive estiver configurado com o SHA-1 da chave de *debug*, cadastre também o SHA-1 da chave de *release* no Google Cloud. Veja [docs/GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md).
 
 ## Como compilar
 
@@ -160,7 +186,7 @@ flutter build apk --release --split-per-abi --target-platform android-arm64
 # saída: build/app/outputs/flutter-apk/app-arm64-v8a-release.apk
 ```
 
-O build de release usa a chave de debug local (`~/.android/debug.keystore`). O SHA-1 dela precisa estar cadastrado no Google Cloud para o login do Drive funcionar (veja [docs/GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md)). Nenhuma chave é versionada neste repositório.
+O build de release usa a chave em `android/key.properties` (arquivo ignorado pelo git). Se esse arquivo não existir, o Gradle cai na chave de debug, só para desenvolvimento. Nenhuma chave ou senha é versionada neste repositório. O SHA-1 da chave de release precisa estar cadastrado no Google Cloud para o login do Drive funcionar no APK publicado (veja [docs/GOOGLE_DRIVE.md](docs/GOOGLE_DRIVE.md)).
 
 ### Estrutura
 
